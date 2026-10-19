@@ -1,0 +1,44 @@
+CREATE TABLE users (
+ id BIGINT PRIMARY KEY AUTO_INCREMENT,
+ name VARCHAR(80) NOT NULL,
+ email VARCHAR(190) NOT NULL UNIQUE,
+ password_hash VARCHAR(100) NOT NULL,
+ role VARCHAR(20) NOT NULL,
+ enabled BOOLEAN NOT NULL DEFAULT TRUE,
+ created_at TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+ CONSTRAINT ck_user_role CHECK (role IN ('PATIENT','DOCTOR','ADMIN','WARD_STAFF'))
+);
+CREATE TABLE auth_sessions (
+ id CHAR(36) PRIMARY KEY,
+ user_id BIGINT NOT NULL,
+ expires_at TIMESTAMP(6) NOT NULL,
+ revoked BOOLEAN NOT NULL DEFAULT FALSE,
+ created_at TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+ FOREIGN KEY (user_id) REFERENCES users(id),
+ INDEX idx_auth_user (user_id)
+);
+CREATE TABLE refresh_tokens (
+ id BIGINT PRIMARY KEY AUTO_INCREMENT,
+ session_id CHAR(36) NOT NULL,
+ token_hash CHAR(64) NOT NULL UNIQUE,
+ consumed BOOLEAN NOT NULL DEFAULT FALSE,
+ expires_at TIMESTAMP(6) NOT NULL,
+ FOREIGN KEY (session_id) REFERENCES auth_sessions(id)
+);
+CREATE TABLE audit_events (
+ id BIGINT PRIMARY KEY AUTO_INCREMENT,
+ actor_id BIGINT NULL,
+ action VARCHAR(64) NOT NULL,
+ resource_type VARCHAR(32) NOT NULL,
+ resource_id VARCHAR(64) NOT NULL,
+ outcome VARCHAR(16) NOT NULL DEFAULT 'SUCCESS',
+ occurred_at TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+ FOREIGN KEY (actor_id) REFERENCES users(id),
+ INDEX idx_audit_time (occurred_at,id)
+);
+CREATE TABLE rate_limit_buckets (
+ bucket_key VARCHAR(100) PRIMARY KEY,
+ hits INT NOT NULL,
+ expires_at TIMESTAMP NOT NULL,
+ INDEX idx_rate_expiry (expires_at)
+);
