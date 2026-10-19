@@ -1,0 +1,31 @@
+name: Isolated synthetic load test
+on: workflow_dispatch
+permissions:
+  contents: read
+jobs:
+  load:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 scripts/dev-setup.py --demo
+      - run: docker compose up --build --wait -d
+      - uses: grafana/setup-k6-action@v1
+        with:
+          k6-version: '1.0.0'
+      - run: k6 run load/hospital.js
+        env:
+          ADMIN_EMAIL: admin@demo.earogyata.test
+          ADMIN_PASSWORD: DemoOnly-ChangeMe42!
+          BENCHMARK_ENV: GitHub Actions ubuntu-latest; Docker Compose MySQL + Java API
+      - run: python3 scripts/update-benchmark.py
+        if: always()
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: measured-load-results
+          path: |
+            results/k6-summary.json
+            README.md
+      - run: docker compose down
+        if: always()
