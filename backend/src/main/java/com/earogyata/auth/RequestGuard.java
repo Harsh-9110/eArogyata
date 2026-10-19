@@ -1,5 +1,6 @@
 package com.earogyata.auth;
 import java.io.IOException;
+import java.io.ByteArrayInputStream;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -13,17 +14,33 @@ public class RequestGuard extends OncePerRequestFilter {
   if(!req.getRequestURI().startsWith("/api/v1/") || req.getMethod().equals("OPTIONS")) { chain.doFilter(req,res); return; }
   var auth=SecurityContextHolder.getContext().getAuthentication();
   AppPrincipal p=auth!=null && auth.getPrincipal() instanceof AppPrincipal a ? a:null;
+  HttpServletRequest checked=req;
   try {
    String origin=req.getHeader("Origin");
    if(!java.util.Set.of("GET","HEAD","OPTIONS").contains(req.getMethod()) && origin!=null && !settings.origins.contains(origin)) throw ApiException.forbidden();
    if(req.getRequestURI().equals("/api/v1/auth/refresh") && (origin==null || !settings.origins.contains(origin))) throw ApiException.forbidden();
    if(req.getContentLengthLong()>16384) throw new ApiException(413,"Request body too large");
+   if(!java.util.Set.of("GET","HEAD","OPTIONS").contains(req.getMethod())) {
+    byte[] bytes=req.getInputStream().readNBytes(16385);
+    if(bytes.length>16384) throw new ApiException(413,"Request body too large");
+    checked=new HttpServletRequestWrapper(req) {
+     @Override public ServletInputStream getInputStream() {
+      ByteArrayInputStream source=new ByteArrayInputStream(bytes);
+      return new ServletInputStream() {
+       public int read() { return source.read(); }
+       public boolean isFinished() { return source.available()==0; }
+       public boolean isReady() { return true; }
+       public void setReadListener(ReadListener listener) { throw new UnsupportedOperationException("Blocking request body only"); }
+      };
+     }
+    };
+   }
    limiter.check(p==null ? "peer:"+req.getRemoteAddr() : "user:"+p.id(),p==null?60:300);
   } catch(ApiException e) {
    audit.add(p==null?null:p.id(),e.status==429?"RATE_LIMITED":"REQUEST_REJECTED","request","redacted","DENIED");
    res.setStatus(e.status); res.setContentType("application/problem+json"); if(e.status==429) res.setHeader("Retry-After","60");
    json.writeValue(res.getOutputStream(),Errors.problem(e.status,e.getMessage())); return;
   }
-  chain.doFilter(req,res);
+  chain.doFilter(checked,res);
  }
 }

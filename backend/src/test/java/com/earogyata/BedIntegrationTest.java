@@ -52,7 +52,7 @@ class BedIntegrationTest extends IntegrationSupport {
   assertThatThrownBy(()->beds.reserve(p(other),new ReserveBed(freshBed(),patient.id()))).isInstanceOf(ApiException.class);
   mvc.perform(post("/api/v1/reservations/"+r.id()+"/cancel").header("Authorization","Bearer "+token(other))).andExpect(status().isForbidden());
   assertThat(beds.reservations(p(other))).isEmpty();
-  mvc.perform(request("/beds",other)).andExpect(status().isOk()).andExpect(jsonPath("$[0].patientName").doesNotExist());
+  mvc.perform(authenticatedGet("/beds",other)).andExpect(status().isOk()).andExpect(jsonPath("$[0].patientName").doesNotExist());
  }
  @Test void cancellationReleasesBedAndAuditRecordsSensitiveActions() {
   long bed=freshBed();var first=beds.reserve(p(patient),new ReserveBed(bed,null));beds.transition(p(patient),first.id(),"CANCELLED");

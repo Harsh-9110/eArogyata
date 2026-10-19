@@ -47,7 +47,7 @@ abstract class IntegrationSupport {
  }
  String token(UserView u) { return auth.login(new Credentials(u.email(),PASSWORD)).response().accessToken(); }
  String body(Object o) throws Exception { return json.writeValueAsString(o); }
- org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder request(String path,UserView u) {
+ org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder authenticatedGet(String path,UserView u) {
   return get("/api/v1"+path).header("Authorization","Bearer "+token(u));
  }
  long doctorId() { return db.queryForObject("SELECT id FROM doctors WHERE user_id=?",Long.class,doctor.id()); }

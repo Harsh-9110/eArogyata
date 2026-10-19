@@ -45,14 +45,14 @@ class QueueIntegrationTest extends IntegrationSupport {
  @Test void patientCannotReadQueueOrModifySomeoneElsesAppointment() throws Exception {
   long sid=seedSession();var booked=queue.book(p(patient),slot(sid,0));
   UserView other=auth.create("Other","idor-"+java.util.UUID.randomUUID()+"@example.test",PASSWORD,"PATIENT",null,null,null);
-  mvc.perform(request("/sessions/"+sid+"/queue",other)).andExpect(status().isForbidden());
+  mvc.perform(authenticatedGet("/sessions/"+sid+"/queue",other)).andExpect(status().isForbidden());
   mvc.perform(post("/api/v1/appointments/"+booked.id()+"/cancel").header("Authorization","Bearer "+token(other))).andExpect(status().isForbidden());
   mvc.perform(post("/api/v1/sessions/"+sid+"/next").header("Authorization","Bearer "+token(ward))).andExpect(status().isForbidden());
   assertThat(queue.mine(p(other))).isEmpty();
  }
  @Test void unassignedDoctorCannotOperateAnotherDoctorsQueue() throws Exception {
   long sid=seedSession();var another=auth.create("Other Doctor","doctor-"+java.util.UUID.randomUUID()+"@example.test",PASSWORD,"DOCTOR","General","Other room",null);
-  mvc.perform(request("/sessions/"+sid+"/queue",another)).andExpect(status().isForbidden());
+  mvc.perform(authenticatedGet("/sessions/"+sid+"/queue",another)).andExpect(status().isForbidden());
   mvc.perform(post("/api/v1/sessions/"+sid+"/next").header("Authorization","Bearer "+token(another))).andExpect(status().isForbidden());
  }
  @Test void ticketsAreMonotonicAndNextUsesWaitingOrder() {
@@ -72,7 +72,7 @@ class QueueIntegrationTest extends IntegrationSupport {
  }
  @Test void sseRequiresAuthenticationAndSendsResourceInvalidations() throws Exception {
   mvc.perform(get("/api/v1/events")).andExpect(status().isUnauthorized());
-  var result=mvc.perform(request("/events",patient)).andExpect(status().isOk()).andExpect(request().asyncStarted()).andReturn();
+  var result=mvc.perform(authenticatedGet("/events",patient)).andExpect(status().isOk()).andExpect(request().asyncStarted()).andReturn();
   assertThat(result.getResponse().getContentAsString()).contains("event:invalidate","queue","beds").doesNotContain(patient.name(),patient.email());
   result.getRequest().getAsyncContext().complete();
  }

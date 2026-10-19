@@ -31,6 +31,7 @@ public class AuthService {
  }
  @Transactional public UserView create(String name,String email,String password,String role,String specialty,String room,Long actor) {
   validatePassword(password);
+  if(password.length()<12) throw new ApiException(400,"Password must contain at least 12 characters");
   if(name.trim().isEmpty()) throw new ApiException(400,"Name is required");
   if(role.equals("DOCTOR") && (specialty==null || specialty.isBlank() || room==null || room.isBlank())) throw new ApiException(400,"Doctors require specialty and room");
   KeyHolder key=new GeneratedKeyHolder();
