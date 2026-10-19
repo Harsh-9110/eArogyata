@@ -1,0 +1,1 @@
+Structural checks passed: 28 OpenAPI operations, 19 schemas, 3 migrations. This is not Spring/MySQL runtime verification.

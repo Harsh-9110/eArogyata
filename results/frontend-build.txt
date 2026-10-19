@@ -1,0 +1,25 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> e-arogyata-web@1.0.0 build
+> npm run generate:api && npm run typecheck && vite build
+
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> e-arogyata-web@1.0.0 generate:api
+> node ../scripts/generate-api.mjs
+
+Generated 19 schemas and 27 typed operations.
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> e-arogyata-web@1.0.0 typecheck
+> tsc --noEmit
+
+vite v8.0.13 building client environment for production...
+[2Ktransforming...✓ 1799 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.63 kB │ gzip:  0.41 kB
+dist/assets/index-BTRGC5ds.css   33.54 kB │ gzip:  8.22 kB
+dist/assets/index-CcM1oCgy.js   239.63 kB │ gzip: 73.79 kB
+
+✓ built in 304ms

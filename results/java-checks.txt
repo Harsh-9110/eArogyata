@@ -1,0 +1,2 @@
+Parsed 29 Java files without syntax errors. Dependency resolution was not performed.
+9 workflow smoke assertions passed. No database or Spring integration was exercised.
