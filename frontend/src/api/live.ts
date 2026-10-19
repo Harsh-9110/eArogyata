@@ -8,11 +8,12 @@ export async function connectLive(signal:AbortSignal,onChange:()=>void,onState:(
    if(!response.ok || !response.body)throw new Error('Live connection unavailable');
    onState('live');onChange();
    const reader=response.body.getReader();const decoder=new TextDecoder();let pending='';
-   try{while(!signal.aborted){const {value,done}=await reader.read();if(done)break;pending+=decoder.decode(value,{stream:true}).replace(/\r\n/g,'\n');
+   try{while(!signal.aborted){const {value,done}=await reader.read();if(done)break;pending=(pending+decoder.decode(value,{stream:true})).replace(/\r\n/g,'\n');
     let boundary;while((boundary=pending.indexOf('\n\n'))>=0){const event=pending.slice(0,boundary);pending=pending.slice(boundary+2);if(event.includes('event:invalidate') || event.includes('event: invalidate'))onChange();}
    }}finally{reader.releaseLock();}
   }catch(error){if(signal.aborted)return;}
+  if(signal.aborted)return;
   onState('reconnecting');
-  await new Promise<void>(resolve=>{const timer=setTimeout(resolve,3000);signal.addEventListener('abort',()=>{clearTimeout(timer);resolve();},{once:true});});
+  await new Promise<void>(resolve=>{const abort=()=>{clearTimeout(timer);resolve();};const timer=setTimeout(()=>{signal.removeEventListener('abort',abort);resolve();},3000);signal.addEventListener('abort',abort,{once:true});});
  }
 }

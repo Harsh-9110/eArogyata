@@ -8,3 +8,6 @@ test-results/
 playwright-report/
 *.log
 .DS_Store
+
+qa/output/
+__pycache__/

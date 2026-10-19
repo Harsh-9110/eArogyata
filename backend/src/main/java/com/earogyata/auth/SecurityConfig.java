@@ -35,7 +35,7 @@ public class SecurityConfig {
  @Bean JwtEncoder encoder(@Value("${app.jwt-secret}") String secret) { return new NimbusJwtEncoder(new ImmutableSecret<>(key(secret))); }
  @Bean JwtDecoder decoder(@Value("${app.jwt-secret}") String secret,AppSettings settings) {
   NimbusJwtDecoder d= NimbusJwtDecoder.withSecretKey(key(secret)).macAlgorithm(MacAlgorithm.HS256).build();
-  OAuth2TokenValidator<Jwt> audience=jwt->jwt.getAudience().contains(settings.audience)?OAuth2TokenValidatorResult.success():OAuth2TokenValidatorResult.failure(new OAuth2Error("invalid_token","Invalid audience",null));
+  OAuth2TokenValidator<Jwt> audience=jwt->jwt.getAudience()!=null && jwt.getAudience().contains(settings.audience)?OAuth2TokenValidatorResult.success():OAuth2TokenValidatorResult.failure(new OAuth2Error("invalid_token","Invalid audience",null));
   d.setJwtValidator(new DelegatingOAuth2TokenValidator<>(JwtValidators.createDefaultWithIssuer(settings.issuer),audience)); return d;
  }
  @Bean SecurityFilterChain security(HttpSecurity http,JdbcTemplate db,AppSettings settings,RateLimiter limiter,ObjectMapper json,Audit audit) throws Exception {

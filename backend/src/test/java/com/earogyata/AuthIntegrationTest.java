@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 class AuthIntegrationTest extends IntegrationSupport {
+ @org.springframework.beans.factory.annotation.Autowired org.springframework.security.oauth2.jwt.JwtEncoder signer;
  @Test void publicSignupCannotSelectStaffRole() throws Exception {
   mvc.perform(post("/api/v1/auth/register").contentType(MediaType.APPLICATION_JSON)
    .content(body(Map.of("name","Attacker","email","role@example.test","password",PASSWORD,"role","ADMIN"))))
@@ -46,6 +47,10 @@ class AuthIntegrationTest extends IntegrationSupport {
   String access=token(patient);
   String[] parts=access.split("\\.");
   mvc.perform(get("/api/v1/auth/me").header("Authorization","Bearer "+parts[0]+".e30."+parts[2])).andExpect(status().isUnauthorized());
+  String sid=json.readTree(java.util.Base64.getUrlDecoder().decode(parts[1])).get("sid").asText();
+  var claims=org.springframework.security.oauth2.jwt.JwtClaimsSet.builder().issuer("e-arogyata").audience(java.util.List.of("e-arogyata-web")).subject(Long.toString(patient.id())).issuedAt(java.time.Instant.now().minusSeconds(2000)).expiresAt(java.time.Instant.now().minusSeconds(1000)).claim("sid",sid).build();
+  String expired=signer.encode(org.springframework.security.oauth2.jwt.JwtEncoderParameters.from(org.springframework.security.oauth2.jwt.JwsHeader.with(org.springframework.security.oauth2.jose.jws.MacAlgorithm.HS256).build(),claims)).getTokenValue();
+  mvc.perform(get("/api/v1/auth/me").header("Authorization","Bearer "+expired)).andExpect(status().isUnauthorized());
   mvc.perform(post("/api/v1/auth/logout").header("Authorization","Bearer "+access)).andExpect(status().isNoContent());
   mvc.perform(get("/api/v1/auth/me").header("Authorization","Bearer "+access)).andExpect(status().isUnauthorized());
   mvc.perform(get("/api/v1/beds")).andExpect(status().isUnauthorized());
@@ -57,7 +62,7 @@ class AuthIntegrationTest extends IntegrationSupport {
  }
  @Test void inputLimitsAndInjectionCannotAuthenticate() throws Exception {
   mvc.perform(post("/api/v1/auth/login").contentType(MediaType.APPLICATION_JSON)
-   .content(body(Map.of("email","' OR 1=1 --@example.test","password",PASSWORD)))).andExpect(status().isUnauthorized());
+   .content(body(Map.of("email","' OR 1=1 --@example.test","password",PASSWORD)))).andExpect(status().is4xxClientError()).andExpect(jsonPath("$.accessToken").doesNotExist());
   mvc.perform(post("/api/v1/auth/register").contentType(MediaType.APPLICATION_JSON)
    .content(body(new Register("Too short","short@example.test","short")))).andExpect(status().isBadRequest());
  }

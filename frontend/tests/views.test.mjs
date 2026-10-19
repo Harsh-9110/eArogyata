@@ -4,6 +4,7 @@ import {createElement} from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
 import compiled from './compile.cjs';
 const {BedsPage,QueuePage,Overview}=compiled.load('App.js');
+const {Modal,ActionErrorContext}=compiled.load('components.js');
 const data={sessions:[],doctors:[],beds:[{id:1,wardId:1,wardName:'Synthetic Ward',floor:'Level 1',label:'T-01',status:'AVAILABLE'}],appointments:[],reservations:[],users:[],audit:[],queue:[],selected:null};
 const user={id:1,name:'Synthetic User',email:'synthetic@example.test',role:'PATIENT'};
 const common={data,user,busy:false,run:async()=>true,onReserve(){},onBook(){},onSession(){},date:'2026-10-20',setDate(){},select(){},selected:null};
@@ -21,4 +22,13 @@ test('empty queues and sessions have actionable empty states',()=>{
 });
 test('dashboard numbers derive from data rather than invented performance claims',()=>{
  const html=renderToStaticMarkup(createElement(Overview,{data,user,go(){},onBook(){}}));assert.match(html,/Available beds/);assert.match(html,/>01</);assert.doesNotMatch(html,/35%|500\+/);
+});
+test('untrusted clinic names are escaped instead of rendered as HTML',()=>{
+ const malicious={id:7,doctorId:1,doctorName:'<img src=x onerror=alert(1)>',specialty:'Synthetic',room:'Room T',date:'2026-10-20',averageMinutes:12,state:'OPEN',waiting:0,booked:0,servingTicket:null};
+ const html=renderToStaticMarkup(createElement(Overview,{data:{...data,sessions:[malicious]},user,go(){},onBook(){}}));
+ assert.match(html,/&lt;img/);assert.doesNotMatch(html,/<img\s/);
+});
+test('action conflicts are visible inside the open dialog',()=>{
+ const html=renderToStaticMarkup(createElement(ActionErrorContext.Provider,{value:'Bed already reserved'},createElement(Modal,{title:'Reserve bed',onClose(){}},'Form content')));
+ assert.match(html,/role="alert">Bed already reserved/);
 });

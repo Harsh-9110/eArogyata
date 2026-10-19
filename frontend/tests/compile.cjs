@@ -5,7 +5,7 @@ const ts=require('typescript');
 const {createRequire}=require('node:module');
 const temp=fs.mkdtempSync(path.join(os.tmpdir(),'earogyata-test-'));
 fs.writeFileSync(path.join(temp,'package.json'),'{"type":"commonjs"}');
-fs.symlinkSync(path.resolve(__dirname,'../node_modules'),path.join(temp,'node_modules'),'dir');
+fs.symlinkSync(path.resolve(__dirname,'../node_modules'),path.join(temp,'node_modules'),process.platform==='win32'?'junction':'dir');
 function compile(dir,relative=''){
  for(const item of fs.readdirSync(dir,{withFileTypes:true})){
   if(item.isDirectory())compile(path.join(dir,item.name),path.join(relative,item.name));

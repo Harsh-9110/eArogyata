@@ -8,7 +8,7 @@ test('fragmented SSE invalidations refresh data without putting a token in the U
  acceptSession({accessToken:'sensitive-access',expiresIn:900,user:{id:1,name:'Synthetic',email:'s@example.test',role:'PATIENT'}});
  globalThis.fetch=async(url,init)=>{
   requested={url,init};
-  const chunks=['event: heart','beat\ndata: {"resource":"heartbeat"}\n\n','event: invali','date\ndata: {"resource":"beds"}\n\n'];
+  const chunks=['event: heart','beat\ndata: {"resource":"heartbeat"}\n\n','event: invali','date\ndata: {"resource":"beds"}\r','\n\r','\n'];
   return new Response(new ReadableStream({start(controller){for(const text of chunks)controller.enqueue(new TextEncoder().encode(text));controller.close();}}),{status:200});
  };
  await connectLive(signal.signal,()=>{if(++changes===2)signal.abort();},()=>{});
