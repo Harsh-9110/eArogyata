@@ -19,7 +19,7 @@ jobs:
           cache-dependency-path: backend/pom.xml
       - run: mvn -B --no-transfer-progress verify
         working-directory: backend
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: junit-results
@@ -37,7 +37,7 @@ jobs:
         working-directory: frontend
       - run: git diff --exit-code -- frontend/src/api/generated.ts backend/src/main/resources/static/openapi.json
       - run: python3 scripts/check-project.py
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: frontend-build
           path: frontend/dist
@@ -50,14 +50,14 @@ jobs:
       - run: docker compose config --quiet && docker compose build
       - run: docker compose up --wait -d
       - run: python3 scripts/security-probe.py
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: active-security-probes
           path: results/security-probe.json
       - run: docker compose logs --no-color api > /tmp/api.log
         if: failure()
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: api-startup-log
