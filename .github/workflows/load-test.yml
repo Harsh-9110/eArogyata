@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - run: python3 scripts/dev-setup.py --demo
       - run: docker compose up --build --wait -d
       - uses: grafana/setup-k6-action@v1
