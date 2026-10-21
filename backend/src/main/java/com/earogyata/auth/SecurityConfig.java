@@ -9,6 +9,7 @@ import com.earogyata.core.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -43,6 +44,7 @@ public class SecurityConfig {
    .sessionManagement(s->s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
    .requestCache(c->c.disable())
    .authorizeHttpRequests(a->a.dispatcherTypeMatchers(jakarta.servlet.DispatcherType.ASYNC,jakarta.servlet.DispatcherType.ERROR).permitAll()
+    .requestMatchers(HttpMethod.GET,"/","/index.html","/assets/**","/favicon.svg").permitAll()
     .requestMatchers("/actuator/health","/openapi.json","/api/v1/auth/login","/api/v1/auth/register","/api/v1/auth/refresh").permitAll()
     .anyRequest().authenticated())
    .exceptionHandling(e->e.authenticationEntryPoint((req,res,ex)->{res.setStatus(401);res.setContentType("application/problem+json");json.writeValue(res.getOutputStream(),Errors.problem(401,"Authentication required"));})
@@ -58,7 +60,7 @@ public class SecurityConfig {
     } catch(NumberFormatException e) { throw new InvalidBearerTokenException("Invalid subject"); }
    })).authenticationEntryPoint((req,res,ex)->{res.setStatus(401);res.setContentType("application/problem+json");json.writeValue(res.getOutputStream(),Errors.problem(401,"Invalid or expired access token"));}));
   http.addFilterAfter(new RequestGuard(settings,limiter,json,audit),BearerTokenAuthenticationFilter.class);
-  http.headers(h->h.contentSecurityPolicy(c->c.policyDirectives("default-src 'none'; frame-ancestors 'none'"))
+  http.headers(h->h.contentSecurityPolicy(c->c.policyDirectives("default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'"))
     .referrerPolicy(r->r.policy(org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter.ReferrerPolicy.NO_REFERRER))
     .cacheControl(org.springframework.security.config.Customizer.withDefaults()));
   return http.build();

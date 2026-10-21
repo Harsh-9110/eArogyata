@@ -4,7 +4,9 @@ A hospital workspace for **OPD queueing and bed management**, rebuilt as a softw
 
 Patients book a slot, check in, follow their queue position, and reserve a bed. Doctors call and complete their own queue. Ward staff admit, discharge and prepare beds. Admins publish OPD sessions, provision accounts and review the audit trail. Pharmacy, checkout, diagnostic tests, chat and medical records are outside this rebuild.
 
-**Live demo:** not deployed. No public URL or recorded video is claimed. The frontend is configured for Vercel; the Java API and MySQL need a separate host. See [deployment](docs/DEPLOYMENT.md) and [two-minute recording workflow](docs/DEMO.md).
+**Deploy free:** follow the [browser-based Render + Aiven setup](docs/FREE_DEPLOYMENT.md). The new root `Dockerfile` serves the website and API together at one URL; `render.yaml` selects Render's Free plan. No Docker Desktop or local Java installation is required for this route.
+
+**Live demo:** not deployed. No public URL or recorded video is claimed. The older separate Vercel frontend option is documented in [deployment](docs/DEPLOYMENT.md). See also the [two-minute recording workflow](docs/DEMO.md).
 
 ## Start locally
 

@@ -2,7 +2,7 @@
 
 Vercel serves the React/Vite frontend. Keep Spring Boot as a long-running Java container and MySQL as a persistent database on a container/VPS or managed backend provider. This repository does not attempt to run a Java server or persistent MySQL in Vercel functions.
 
-No cloud resources were provisioned, no costs incurred, and no live URL was obtained during this build. Vercel/GitHub/deployment integrations are disabled by the current workspace admin. Use the following concrete configuration when publishing from your account.
+No cloud resources were provisioned, no costs incurred, and no live URL was obtained during this build. Publishing from your hosting account requires its sign-in and deployment access. Use the following concrete configuration when publishing from your account. For the simpler free single-service option, see [FREE_DEPLOYMENT.md](FREE_DEPLOYMENT.md).
 
 ## 1. Verify the code before publishing
 
@@ -26,7 +26,7 @@ Build from the repository root with Dockerfile `backend/Dockerfile`. The contain
 | BOOTSTRAP_ADMIN_PASSWORD | Your chosen strong initial password, at least 12 characters and at most 72 UTF-8 bytes |
 | SPRING_PROFILES_ACTIVE | Empty / production configuration; do not enable `demo` for a private production instance |
 
-Flyway runs before startup. First startup creates an administrator only if no ADMIN exists and bootstrap variables are provided. Remove bootstrap password from the deployment configuration afterward. No production credentials are checked into this repository. Reference wards/beds come from V3; user records are not inserted by migrations. With an empty production database, sign in as admin, create doctor/patient/staff accounts and publish future sessions.
+Flyway runs before startup. First startup creates an administrator only if no ADMIN exists and bootstrap variables are provided. After confirming the administrator can sign in, remove both BOOTSTRAP_ADMIN_EMAIL and BOOTSTRAP_ADMIN_PASSWORD from the deployment configuration. Leaving the email set without a valid password prevents the next startup. No production credentials are checked into this repository. Reference wards/beds come from V3; user records are not inserted by migrations. With an empty production database, sign in as admin, create doctor/patient/staff accounts and publish future sessions.
 
 For stricter database separation, run migrations in an authorized release job, then set `SPRING_FLYWAY_ENABLED=false` for the runtime and use restricted table grants. The application needs SELECT/INSERT/UPDATE on workflow tables, SELECT/INSERT on audit_events, and SELECT/INSERT/UPDATE/DELETE on rate_limit_buckets. It does not need UPDATE/DELETE on audit_events or runtime DDL. Default local startup intentionally uses one migration-capable account. Back up and verify restore procedures before real usage; this portfolio instance should use synthetic accounts.
 
