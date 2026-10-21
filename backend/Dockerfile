@@ -5,7 +5,7 @@ RUN mvn -B --no-transfer-progress dependency:go-offline
 COPY backend/src ./src
 RUN mvn -B --no-transfer-progress -DskipTests package
 
-FROM eclipse-temurin:17-jre-alpine
+FROM eclipse-temurin:25-jre-alpine
 RUN addgroup -S hospital && adduser -S hospital -G hospital
 WORKDIR /app
 COPY --from=build --chown=hospital:hospital /build/target/hospital-api-1.0.0.jar app.jar
