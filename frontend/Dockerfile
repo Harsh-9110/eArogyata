@@ -12,7 +12,7 @@ ENV VITE_DEMO_MODE=$VITE_DEMO_MODE
 ENV VITE_HOSPITAL_TIMEZONE=$VITE_HOSPITAL_TIMEZONE
 RUN npm run build
 
-FROM nginxinc/nginx-unprivileged:1.28-alpine
+FROM nginxinc/nginx-unprivileged:1.31-alpine
 COPY frontend/nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /app/frontend/dist /usr/share/nginx/html
 EXPOSE 8080
