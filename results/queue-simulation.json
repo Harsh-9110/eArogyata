@@ -1,0 +1,22 @@
+{
+  "label": "SIMULATED \u2014 not a measured clinical or API result",
+  "seed": 42,
+  "patients": 500,
+  "doctor_days": 30,
+  "assumptions": {
+    "baseline": "Uniform arrivals during a 90-minute morning cluster",
+    "scheduled": "12-minute scheduled spacing with normal arrival jitter, SD 8 minutes, clamped to 0",
+    "service": "Identical paired lognormal consultation durations, mean 12 minutes, log-space SD 0.35",
+    "policy": "Non-preemptive FIFO by arrival in both scenarios; one clinician per queue",
+    "exclusions": "No urgent cases, breaks, no-shows, bed effects or patient outcomes; no calibration to real hospitals"
+  },
+  "clustered_arrivals": {
+    "mean_wait_minutes": 59.997,
+    "p95_wait_minutes": 125.625
+  },
+  "scheduled_arrivals": {
+    "mean_wait_minutes": 11.868,
+    "p95_wait_minutes": 33.792
+  },
+  "mean_wait_reduction_percent_simulated": 80.219
+}

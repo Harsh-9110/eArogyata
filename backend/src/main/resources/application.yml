@@ -1,0 +1,49 @@
+server:
+  port: ${PORT:8080}
+  forward-headers-strategy: none
+  error:
+    include-message: never
+    include-stacktrace: never
+  tomcat:
+    max-http-form-post-size: 16KB
+    max-swallow-size: 16KB
+spring:
+  application:
+    name: e-arogyata
+  datasource:
+    url: ${DB_URL:jdbc:mysql://localhost:3306/earogyata?connectionTimeZone=UTC&forceConnectionTimeZoneToSession=true}
+    username: ${DB_USER:earogyata}
+    password: ${DB_PASSWORD}
+    hikari:
+      maximum-pool-size: 12
+      connection-timeout: 5000
+  flyway:
+    enabled: true
+    clean-disabled: true
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: true
+  mvc:
+    async:
+      request-timeout: 900000
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never
+app:
+  jwt-secret: ${JWT_SECRET}
+  issuer: e-arogyata
+  audience: e-arogyata-web
+  access-seconds: 900
+  refresh-days: 7
+  allowed-origins: ${ALLOWED_ORIGINS:http://localhost:5173,http://localhost:3000}
+  cookie-secure: ${COOKIE_SECURE:true}
+  zone: ${HOSPITAL_TIMEZONE:Asia/Kolkata}
+  bootstrap-email: ${BOOTSTRAP_ADMIN_EMAIL:}
+  bootstrap-password: ${BOOTSTRAP_ADMIN_PASSWORD:}
+  demo-password: ${DEMO_PASSWORD:DemoOnly-ChangeMe42!}
+  rate-limit-enabled: ${RATE_LIMIT_ENABLED:true}

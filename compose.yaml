@@ -1,0 +1,69 @@
+name: earogyata
+services:
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: earogyata
+      MYSQL_USER: earogyata
+      MYSQL_PASSWORD: ${DB_PASSWORD:?Run python3 scripts/dev-setup.py --demo first}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Generate your .env first}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: [CMD-SHELL, 'MYSQL_PWD="$$MYSQL_ROOT_PASSWORD" mysqladmin ping -h localhost --silent']
+      interval: 5s
+      timeout: 5s
+      retries: 30
+    restart: unless-stopped
+  api:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    environment:
+      DB_URL: jdbc:mysql://mysql:3306/earogyata?connectionTimeZone=UTC&forceConnectionTimeZoneToSession=true&allowPublicKeyRetrieval=true&sslMode=DISABLED
+      DB_USER: earogyata
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET:?Generate your .env first}
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-}
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://localhost:3000,http://localhost:5173}
+      HOSPITAL_TIMEZONE: ${HOSPITAL_TIMEZONE:-Asia/Kolkata}
+      BOOTSTRAP_ADMIN_EMAIL: ${BOOTSTRAP_ADMIN_EMAIL:-}
+      BOOTSTRAP_ADMIN_PASSWORD: ${BOOTSTRAP_ADMIN_PASSWORD:-}
+      JAVA_TOOL_OPTIONS: -XX:MaxRAMPercentage=70.0
+    ports:
+      - '127.0.0.1:8080:8080'
+    depends_on:
+      mysql:
+        condition: service_healthy
+    healthcheck:
+      test: [CMD-SHELL, 'wget -q -O /dev/null http://127.0.0.1:8080/actuator/health || exit 1']
+      interval: 10s
+      start_period: 45s
+      timeout: 5s
+      retries: 12
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 768m
+    restart: unless-stopped
+  web:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+      args:
+        VITE_DEMO_MODE: ${VITE_DEMO_MODE:-false}
+        VITE_HOSPITAL_TIMEZONE: ${VITE_HOSPITAL_TIMEZONE:-Asia/Kolkata}
+    ports:
+      - '127.0.0.1:3000:8080'
+    depends_on:
+      api:
+        condition: service_healthy
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    restart: unless-stopped
+volumes:
+  mysql_data:

@@ -1,0 +1,32 @@
+e-AROGYATA free deployment preparation — 2026-10-21
+
+PASS: deploy/start.sh POSIX shell syntax (sh -n).
+PASS: 8 startup-script scenarios using real keytool certificate import/list,
+      with JVM startup stubbed (no Spring server or MySQL connection).
+      Covered assigned Render URL with suffix and trailing slash, explicit
+      custom origin, verified TLS URL, private truststore permissions, removing
+      the certificate env var, missing/invalid CA, non-JDBC address, query-string
+      override rejection, missing signing secret, and missing public origin.
+PASS: Render YAML structural assertions: exactly one Docker web service using
+      plan free; correct Dockerfile and health path; six supplied settings;
+      generated JWT secret; no database/disk/paid resources in the Blueprint.
+      Not validated against Render's API or full JSON schema.
+PASS: scripts/check-project.py — 28 OpenAPI operations, 19 schemas, 3 migrations.
+PASS: scripts/ParseJava.java — 30 Java source files parse without syntax errors.
+      This does not resolve Spring dependencies or compile the application.
+PASS: 9 standalone WorkflowSmoke assertions after JavaCompiler compilation.
+      No database or Spring integration was exercised.
+
+BLOCKED: npm ci — HTTP 403 from registry.npmjs.org for pinned package downloads.
+BLOCKED: Maven artifact downloads — HTTP 403 from repo.maven.apache.org.
+UNAVAILABLE: Maven executable and Docker daemon/CLI.
+NOT RUN: new DeploymentSecurityTest JUnit tests; full React/Java/container builds;
+         MySQL integration tests; live Render/Aiven provisioning; browser login
+         or live memory/capacity verification.
+
+The root Dockerfile runs DeploymentSecurityTest and WorkflowRulesTest during
+its Maven package step when the provider has dependency access. Existing CI
+still defines the complete MySQL Testcontainers integration suite.
+
+No live URL, provider resources, costs, uptime or measured hosting capacity
+are claimed. See docs/FREE_DEPLOYMENT.md for the account setup and smoke checks.

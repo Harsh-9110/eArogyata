@@ -1,0 +1,26 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> e-arogyata-web@1.0.0 test
+> node --test tests/*.test.mjs
+
+✔ concurrent unauthorized requests rotate refresh once and retry with the new token (15.594079ms)
+✔ refresh failure clears only the in-memory session (0.679081ms)
+✔ typed operation builds the expected URL and mutation body (1.320015ms)
+✔ server conflict details reach the UI and are not reported as success (1.113771ms)
+✔ no-content response is supported for logout (0.455671ms)
+✔ fragmented SSE invalidations refresh data without putting a token in the URL (4.376088ms)
+✔ patients can reserve but cannot see ward operational controls (9.409265ms)
+✔ ward staff can take a bed out of service (2.591098ms)
+✔ doctor bed view has availability without reservation controls (1.938837ms)
+✔ empty queues and sessions have actionable empty states (15.252965ms)
+✔ dashboard numbers derive from data rather than invented performance claims (5.139383ms)
+✔ untrusted clinic names are escaped instead of rendered as HTML (4.856046ms)
+✔ action conflicts are visible inside the open dialog (1.037589ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 13
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 635.652397

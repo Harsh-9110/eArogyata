@@ -1,0 +1,60 @@
+{
+  "date": "2026-11-28",
+  "scope": "Startup shell script with fake Java process; actual keytool for custom CA import. Does not start Spring Boot or connect to MySQL.",
+  "checks": [
+    {
+      "check": "Public CA path starts Java and enforces certificate/hostname verification",
+      "passed": true
+    },
+    {
+      "check": "JDBC connection pins UTC and execs the expected jar",
+      "passed": true
+    },
+    {
+      "check": "Northflank public hostname becomes exact HTTPS origin",
+      "passed": true
+    },
+    {
+      "check": "Multiple public hostnames trim whitespace and omit empties",
+      "passed": true
+    },
+    {
+      "check": "Explicit allowlist takes precedence",
+      "passed": true
+    },
+    {
+      "check": "Missing origin configuration stops before Java",
+      "passed": true
+    },
+    {
+      "check": "Blank platform host list stops before Java",
+      "passed": true
+    },
+    {
+      "check": "Missing database password stops before Java",
+      "passed": true
+    },
+    {
+      "check": "Non-JDBC URLs are rejected",
+      "passed": true
+    },
+    {
+      "check": "Existing query cannot override mandatory TLS policy",
+      "passed": true
+    },
+    {
+      "check": "Invalid custom CA fails closed",
+      "passed": true
+    },
+    {
+      "check": "Valid custom CA creates a private PKCS12 truststore and removes PEM env",
+      "passed": true
+    },
+    {
+      "check": "Truststore exists with private directory permissions",
+      "passed": true
+    }
+  ],
+  "passed": 13,
+  "failed": 0
+}

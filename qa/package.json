@@ -1,0 +1,7 @@
+{
+  "name": "earogyata-demo-recorder",
+  "private": true,
+  "type": "module",
+  "scripts": {"record": "node record-demo.mjs"},
+  "devDependencies": {"playwright": "1.62.1"}
+}
